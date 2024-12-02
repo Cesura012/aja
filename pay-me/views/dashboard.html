@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../styles/style_dashboard.css" />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <title>Pay-me</title>
+  </head>
+
+  <body>
+    <div class="dashboard">
+      <div class="sidebar-container"></div>
+      <div class="container">
+        <h1>Hola Usuario</h1>
+        <div class="card-container" id="info-account">
+          <div class="card">
+            <h2>Saldo Actual</h2>
+            <button id="add-button" class="add-button">
+              <i class="material-icons">add</i>
+            </button>
+            <p id="balance-account">$0.00</p>
+          </div>
+          <div class="card">
+            <h2>Ingresos</h2>
+            <h4>Total de ingresos del mes</h4>
+            <p id="total-incomes">$0.00</p>
+          </div>
+          <div class="card">
+            <h2>Gastos</h2>
+            <h4>Total de gastos del mes</h4>
+            <p id="total-spent">$0.00</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <dialog id="modal-form">
+      <div class="modal-content">
+        <button type="button" id="cerrar-modal">
+          <span class="close">&times;</span>
+        </button>
+        <form id="formAddFundToAccount">
+          <label for="card_id">Tarjeta:</label>
+          <select id="card_id">
+            <option value="">Seleccionar</option>
+          </select>
+          <label for="paymentAmount">Monto a Pagar:</label>
+          <input
+            type="number"
+            id="paymentAmount"
+            placeholder="$0.00"
+            required
+          />
+
+          <button type="submit">Añadir fondos</button>
+        </form>
+      </div>
+    </dialog>
+    <script src="../scripts/sidebar.js"></script>
+  </body>
+</html>
