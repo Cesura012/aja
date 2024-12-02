@@ -113,4 +113,38 @@ if (formAddCard) {
   });
 }
 
+const formMakePayment = document.getElementById("formMakePayment");
+
+if (formMakePayment) {
+  formMakePayment.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const amount = document.getElementById("paymentAmount").value;
+    const institution = document.getElementById("institution").value;
+    const paymentConcept = document.getElementById("description").value;
+    const paymentMethod = document.getElementById("paymentMethod").value;
+    const sessionInfo = JSON.parse(localStorage.getItem("sessionInfo"));
+    const { user_id } = sessionInfo.userInfo;
+
+    const res = await fetch(`${API_URL}/payments`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user_id,
+        amount,
+        institution,
+        payment_concept: paymentConcept,
+        paymentMethod,
+      }),
+    });
+    const data = await res.json();
+    if (data.error && data.error.length > 0) {
+      alert(`${data.message}: ${data.error}`);
+    } else {
+      alert(data.message);
+    }
+  });
+}
+
 document.addEventListener("DOMContentLoaded", loadSidebar);

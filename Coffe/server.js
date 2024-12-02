@@ -146,14 +146,15 @@ app.post("/payments", async (req, res) => {
   let pool;
   let connection;
   try {
-    const { user_id, amount, institution, payment_concept } = req.body;
+    const { user_id, amount, institution, payment_concept, paymentMethod } =
+      req.body;
 
     pool = await connect();
     connection = await pool.getConnection();
 
     const [result] = await connection.query(
-      "CALL SP_MAKE_PAYMENT(?, ?, ?, ?)",
-      [user_id, amount, institution, payment_concept]
+      "CALL SP_MAKE_PAYMENT(?, ?, ?, ?, ?)",
+      [user_id, amount, institution, payment_concept, paymentMethod]
     );
 
     res.status(201).json({
