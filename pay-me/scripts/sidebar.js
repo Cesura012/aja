@@ -147,4 +147,69 @@ if (formMakePayment) {
   });
 }
 
+const movementsTable = document.getElementById("movements-table");
+
+if (movementsTable) {
+  document.addEventListener("DOMContentLoaded", () => {
+    rechargeMovements();
+    document.getElementById("filter-date").addEventListener("change", (e) => {
+      if (e.target.value !== "") {
+        rechargeMovements();
+      }
+    });
+    document.getElementById("filter-type").addEventListener("change", (e) => {
+      rechargeMovements();
+    });
+  });
+}
+
+async function rechargeMovements() {
+  (async () => {
+    const sessionInfo = JSON.parse(localStorage.getItem("sessionInfo"));
+    const { user_id } = sessionInfo.userInfo;
+    const filterFecha = document.getElementById("filter-date");
+    const filterType = document.getElementById("filter-type");
+    const transactionsURLParamsFilters = new URLSearchParams();
+    transactionsURLParamsFilters.append("user_id", user_id);
+    if (filterFecha?.value !== "" && filterFecha?.value !== "null") {
+      transactionsURLParamsFilters.append("date", filterFecha?.value);
+    }
+    if (filterType?.value !== "" && filterType?.value !== "null") {
+      transactionsURLParamsFilters.append("type", filterType?.value);
+    }
+
+    const res = await fetch(
+      `${API_URL}/transactions?${transactionsURLParamsFilters.toString()}`
+    );
+    const data = await res.json();
+    if (data.error && data.error.length > 0) {
+      alert(`${data.message}: ${data.error}`);
+    } else {
+      const transactions = data.data;
+      const tbody = document.getElementById("transactions-table-tbody");
+      tbody.innerHTML = "";
+      const row = document.querySelector(".empty-state");
+      if (transactions.length === 0) {
+        row.style.display = "block";
+      } else {
+        row.style.display = "none";
+      }
+      transactions.forEach((transaction) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+      <td>${transaction.transaction_id}</td>
+      <td>${transaction.amount}</td>
+      <td>${transaction.message}</td>
+      <td>${transaction.status}</td>
+      <td>${Intl.DateTimeFormat("es-CO", {
+        dateStyle: "full",
+        timeStyle: "short",
+      }).format(new Date(transaction.created_at))}</td>
+      </td>
+    `;
+        tbody.appendChild(row);
+      });
+    }
+  })();
+}
 document.addEventListener("DOMContentLoaded", loadSidebar);

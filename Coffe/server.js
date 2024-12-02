@@ -111,6 +111,52 @@ app.post("/login", async (req, res) => {
   }
 });
 
+app.get("/transactions", async (req, res) => {
+  let pool;
+  let connection;
+  try {
+    pool = await connect();
+    connection = await pool.getConnection();
+
+    const searchParams = new URLSearchParams(req.query);
+    const { fecha, tipo, user_id } = {
+      fecha: searchParams.get("date"),
+      tipo: searchParams.get("type"),
+      user_id: searchParams.get("user_id"),
+    };
+    const queryInitial = "SELECT * FROM transactions";
+    const queryFilters = [];
+    if (fecha)
+      queryFilters.push(
+        `created_at BETWEEN '${fecha} 00:00:00' AND '${fecha} 23:59:59'`
+      );
+    if (tipo == "income") queryFilters.push(`amount  > 0`);
+    if (tipo == "spent") queryFilters.push(`amount < 0`);
+    if (user_id)
+      queryFilters.push(
+        `(sender_id = ${user_id} OR recipient_id = ${user_id})`
+      );
+    const queryFinal = queryFilters.length
+      ? queryInitial + " WHERE " + queryFilters.join(" AND ")
+      : queryInitial;
+    console.log("Ejecutando consulta:", queryFinal);
+    const [rows] = await connection.query(queryFinal);
+
+    res.json({
+      data: rows,
+      message: "Transacciones obtenidas exitosamente",
+    });
+  } catch (err) {
+    console.error("Error al obtener transacciones:", err);
+    res.status(500).json({
+      message: "Error al obtener transacciones",
+      error: err.message,
+    });
+  } finally {
+    if (connection) connection.release();
+  }
+});
+
 // SIMPLE TRANSFER
 app.post("/transfers", async (req, res) => {
   let pool;
