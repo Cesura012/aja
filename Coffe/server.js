@@ -78,6 +78,34 @@ app.post("/users", async (req, res) => {
   }
 });
 
+app.get("/accounts/:user_id", async (req, res) => {
+  let pool;
+  let connection;
+  try {
+    const { user_id } = req.params;
+
+    pool = await connect();
+    connection = await pool.getConnection();
+
+    const [rowsTransaction] = await connection.query(
+      "SELECT a.balance, (SELECT SUM(amount) FROM transactions WHERE sender_id = a.user_id AND amount > 0) AS total_incomes,(SELECT SUM(amount) FROM transactions WHERE sender_id = a.user_id AND amount < 0) AS total_spent  FROM accounts a WHERE a.user_id = ?;",
+      [user_id]
+    );
+    res.json({
+      data: rowsTransaction[0],
+      message: "Cuenta obtenida exitosamente",
+    });
+  } catch (err) {
+    console.error("Error al obtener cuenta:", err);
+    res.status(500).json({
+      message: "Error al obtener cuenta",
+      error: err.message,
+    });
+  } finally {
+    if (connection) connection.release();
+  }
+});
+
 // LOGIN
 app.post("/login", async (req, res) => {
   let pool;
@@ -287,6 +315,35 @@ app.post("/addCards", async (req, res) => {
     console.error("Error:", err);
     res.status(500).json({
       message: "Error al agregar la tarjeta",
+      error: err.message,
+    });
+  } finally {
+    if (connection) connection.release();
+  }
+});
+// servicio para obtener las tarjetas de un usuario
+app.get("/cards/:user_id", async (req, res) => {
+  let pool;
+  let connection;
+  try {
+    const { user_id } = req.params;
+
+    pool = await connect();
+    connection = await pool.getConnection();
+
+    const [rows] = await connection.query(
+      "SELECT * FROM cards WHERE user_id = ?",
+      [user_id]
+    );
+
+    res.json({
+      data: rows,
+      message: "Tarjetas obtenidas exitosamente",
+    });
+  } catch (err) {
+    console.error("Error al obtener tarjetas:", err);
+    res.status(500).json({
+      message: "Error al obtener tarjetas",
       error: err.message,
     });
   } finally {

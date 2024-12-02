@@ -221,11 +221,107 @@ async function rechargeMovements() {
 }
 document.addEventListener("DOMContentLoaded", loadSidebar);
 
-const btnCerrarSesion = document.getElementById("cerrar-session-btn");
+// const btnCerrarSesion = document.getElementById("cerrar-session-btn");
 
-btnCerrarSesion.addEventListener("click", (e) => {
-  e.preventDefault();
-  console.log("asdasd");
-  localStorage.removeItem("sessionInfo");
-  window.location.href = "./login_registro.html";
-});
+// btnCerrarSesion.addEventListener("click", (e) => {
+//   e.preventDefault();
+//   console.log("asdasd");
+//   localStorage.removeItem("sessionInfo");
+//   window.location.href = "./login_registro.html";
+// });
+
+const infoAccountContainer = document.getElementById("info-account");
+
+if (infoAccountContainer) {
+  (async () => {
+    const balanceEl = document.getElementById("balance-account");
+    const totalIncomesEl = document.getElementById("total-incomes");
+    const totalSpentEl = document.getElementById("total-spent");
+    const session = JSON.parse(localStorage.getItem("sessionInfo"));
+    const infoUser = session.userInfo;
+    const resInfoAccount = await fetch(
+      `${API_URL}/accounts/${infoUser.user_id}`
+    );
+
+    const dataInfoAccount = await resInfoAccount.json();
+    if (dataInfoAccount.error && dataInfoAccount.error.length > 0) {
+      alert(`${dataInfoAccount.message}: ${dataInfoAccount.error}`);
+    } else {
+      const formatter = new Intl.NumberFormat("es-CO", {
+        style: "currency",
+        currency: "COP",
+        currencyDisplay: "code",
+      });
+      const infoAccount = dataInfoAccount.data;
+      balanceEl.textContent = formatter.format(infoAccount.balance);
+      totalIncomesEl.textContent = formatter.format(infoAccount.total_incomes);
+      totalSpentEl.textContent = formatter.format(infoAccount.total_spent);
+    }
+  })();
+}
+
+const addButtonOpenModalForm = document.getElementById("add-button");
+if (addButtonOpenModalForm) {
+  addButtonOpenModalForm.addEventListener("click", () => {
+    const cerrarModal = document.getElementById("cerrar-modal");
+    const modal = document.getElementById("modal-form");
+    modal.style.display = "block";
+    cerrarModal.addEventListener("click", () => {
+      modal.style.display = "none";
+    });
+  });
+}
+
+const card_id_input = document.getElementById("card_id");
+
+if (card_id_input) {
+  (async () => {
+    const session = JSON.parse(localStorage.getItem("sessionInfo"));
+    const infoUser = session.userInfo;
+    const res = await fetch(`${API_URL}/cards/${infoUser.user_id}`);
+    const data = await res.json();
+    if (data.error && data.error.length > 0) {
+      alert(`${data.message}: ${data.error}`);
+    } else {
+      const cards = data.data;
+      const select = document.getElementById("card_id");
+      cards.forEach((card) => {
+        const option = document.createElement("option");
+        option.value = card.card_id;
+        option.textContent = card.card_number;
+        select.appendChild(option);
+      });
+    }
+  })();
+}
+
+const formAddFundToAccount = document.getElementById("formAddFundToAccount");
+
+if (formAddFundToAccount) {
+  formAddFundToAccount.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const amount = document.getElementById("paymentAmount").value;
+    const card_id = document.getElementById("card_id").value;
+    const sessionInfo = JSON.parse(localStorage.getItem("sessionInfo"));
+    const { user_id } = sessionInfo.userInfo;
+
+    const res = await fetch(`${API_URL}/addFunds`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        user_id,
+        amount,
+        card_id,
+      }),
+    });
+    const data = await res.json();
+    if (data.error && data.error.length > 0) {
+      alert(`${data.message}: ${data.error}`);
+    } else {
+      alert(data.message);
+      window.location.reload();
+    }
+  });
+}
