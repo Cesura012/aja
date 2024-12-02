@@ -136,9 +136,10 @@ app.get("/transactions", async (req, res) => {
       queryFilters.push(
         `(sender_id = ${user_id} OR recipient_id = ${user_id})`
       );
-    const queryFinal = queryFilters.length
-      ? queryInitial + " WHERE " + queryFilters.join(" AND ")
-      : queryInitial;
+    const queryFinal =
+      (queryFilters.length
+        ? queryInitial + " WHERE " + queryFilters.join(" AND ")
+        : queryInitial) + " ORDER BY created_at DESC";
     console.log("Ejecutando consulta:", queryFinal);
     const [rows] = await connection.query(queryFinal);
 

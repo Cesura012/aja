@@ -47,6 +47,11 @@ function initializeSidebarNavigation() {
 function navigateTo(url) {
   window.location.href = url;
 }
+const sessionInfo = JSON.parse(localStorage.getItem("sessionInfo"));
+if (!sessionInfo) {
+  window.location.href = "./login_registro.html";
+}
+
 const infoUser = JSON.parse(localStorage.getItem("infoUser"));
 const API_URL = "http://localhost:3000";
 
@@ -54,6 +59,8 @@ const formMakeTransfer = document.getElementById("formMakeTransfer");
 if (formMakeTransfer) {
   formMakeTransfer.addEventListener("submit", async (event) => {
     event.preventDefault();
+    const session = JSON.parse(localStorage.getItem("sessionInfo"));
+    const infoUser = session.userInfo;
     const recipientEmail = document.getElementById("recipientEmail").value;
     const amount = document.getElementById("amount").value;
     const message = document.getElementById("message").value;
@@ -63,7 +70,7 @@ if (formMakeTransfer) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        sender_id: "1",
+        sender_id: infoUser.user_id,
         recipient_email: recipientEmail,
         amount,
         message,
@@ -213,3 +220,12 @@ async function rechargeMovements() {
   })();
 }
 document.addEventListener("DOMContentLoaded", loadSidebar);
+
+const btnCerrarSesion = document.getElementById("cerrar-session-btn");
+
+btnCerrarSesion.addEventListener("click", (e) => {
+  e.preventDefault();
+  console.log("asdasd");
+  localStorage.removeItem("sessionInfo");
+  window.location.href = "./login_registro.html";
+});
