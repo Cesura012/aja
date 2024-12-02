@@ -33,10 +33,10 @@ formSignIn.addEventListener("submit", async function (event) {
     alert(data.message);
   } else {
     localStorage.setItem(
-      "infoUser",
+      "sessionInfo",
       JSON.stringify({
-        email,
-        password,
+        userInfo: data.sessionInfo.userInfo,
+        accountInfo: data.sessionInfo.account,
       })
     );
     window.location.href = `./dashboard.html`;

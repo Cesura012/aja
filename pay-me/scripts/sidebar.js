@@ -85,6 +85,11 @@ if (formAddCard) {
     const cardNumber = document.getElementById("cardNumber").value;
     const expirationDate = document.getElementById("expirationDate").value;
     const cvv = document.getElementById("cvv").value;
+    const cardType = document.getElementById("cardType").value;
+    const card_holder = document.getElementById("card_holder").value;
+    const sessionInfo = JSON.parse(localStorage.getItem("sessionInfo"));
+    const { user_id } = sessionInfo.userInfo;
+
     const res = await fetch(`${API_URL}/addCards`, {
       method: "POST",
       headers: {
@@ -93,9 +98,10 @@ if (formAddCard) {
       body: JSON.stringify({
         user_id,
         card_number: cardNumber,
-        card_holder: "Jhon Doe",
+        card_holder,
         expiration_date: expirationDate,
-        card_type: "debit",
+        card_type: cardType,
+        cvv,
       }),
     });
     const data = await res.json();

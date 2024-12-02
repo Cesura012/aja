@@ -19,6 +19,11 @@
         <div class="add-card-table">
           <h2>Agregar Nueva Tarjeta</h2>
           <form id="formAddCard">
+            <label for="cardType">Tipo de Tarjeta</label>
+            <select name="cardType" id="cardType">
+              <option value="debit">Debito</option>
+              <option value="credit">Credito</option>
+            </select>
             <label for="cardNumber">Número de Tarjeta:</label>
             <input
               type="text"
@@ -26,6 +31,8 @@
               placeholder="0000 0000 0000 0000"
               required
             />
+            <label for="card_holder">Nombre en la tarjeta:</label>
+            <input type="text" id="card_holder" placeholder="000" required />
             <label for="expirationDate">Fecha de Vencimiento:</label>
             <input
               type="text"
